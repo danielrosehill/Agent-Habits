@@ -37,7 +37,14 @@ maintains a marker-delimited region and leaves everything around it alone:
 python3 scripts/install.py                     # dry run — prints the diff
 python3 scripts/install.py --write             # backs the target up first
 python3 scripts/install.py --only agent-first,verify-dont-infer --target ./CLAUDE.md --write
+python3 scripts/install.py --set APPROVAL_LIMIT='$20' --write   # tune a habit variable
 ```
+
+Some habits have values you can tune, such as the spend limit in `spend-approval-limit`.
+`--set NAME=VALUE` overrides a value, and the flag can be repeated. The values used
+are recorded in a comment inside the installed block, so a later reinstall without
+`--set` keeps them. A value with no override and no recorded entry falls back to the
+default in the habit's frontmatter.
 
 Three skills drive this, in `skills/`:
 
@@ -61,6 +68,7 @@ Three skills drive this, in `skills/`:
 | [`skill-or-not`](habits/skill-or-not.md) | practice | Before a task, ask whether it should become a skill |
 | [`ship-without-asking`](habits/ship-without-asking.md) | practice | Finished means deployed, not committed |
 | [`parallelise-without-asking`](habits/parallelise-without-asking.md) | practice | Spawn the agent, don't propose it |
+| [`spend-approval-limit`](habits/spend-approval-limit.md) | practice | Spend freely below a set limit; estimate and ask above it |
 | [`explain-less-do-more`](habits/explain-less-do-more.md) | prohibition | Do the work; instruct only when asked to |
 | [`no-unsolicited-security-advice`](habits/no-unsolicited-security-advice.md) | prohibition | My environment, my risk calculus, not yours |
 
@@ -97,6 +105,20 @@ assembled/      Generated output, committed so it is usable without running anyt
 Each habit file carries `id`, `title`, `stance`, `order`, `added`, `status` and
 `source` in frontmatter. `## Snippet` is the text that goes into a system prompt;
 `## Why` is context for me and is excluded from the assembled output.
+
+A habit with tunable values also declares a `variables:` block, one level deep, with
+quoted values and optional `# comments`:
+
+```yaml
+variables:
+  APPROVAL_LIMIT: "$5"       # per-task spend allowed without asking
+```
+
+The snippet refers to each value as `{{APPROVAL_LIMIT}}`. `assemble.py` fails the build
+if the snippet uses a placeholder the block doesn't declare, or the block declares
+one the snippet never uses. `habits.md` gets the defaults filled in. `habits.json`
+also carries the raw `template` and `variables`, which `install.py` uses to fill in
+other values.
 
 ---
 

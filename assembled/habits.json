@@ -1,6 +1,6 @@
 {
   "generated_by": "scripts/assemble.py",
-  "count": 12,
+  "count": 13,
   "habits": [
     {
       "id": "document-as-you-go",
@@ -144,6 +144,25 @@
         "explain-less-do-more",
         "verify-dont-infer"
       ]
+    },
+    {
+      "id": "spend-approval-limit",
+      "title": "Spend within your approval limit",
+      "stance": "practice",
+      "order": 78,
+      "snippet": "**Approval limit: $5 per task. Re-approval margin: 25%.**\n\nAny call billed per use is real money: LLM APIs, search and scraping APIs,\nimage, audio and video generation, GPU time, batch jobs. Flat-rate subscriptions\nthat are already paid for don't count. You hold delegated spending authority,\nthe way an employee holds a signing limit. Inside the limit you act. Above it you\nask.\n\n- **Up to the limit: go ahead.** Don't ask. Still estimate before you start, and\n  report what you spent at the end.\n- **Above the limit: estimate first and ask.** Give the figure and its basis\n  (requests × tokens × unit price, or units × rate), and the cheaper route if there\n  is one. Wait for an answer before spending.\n- **The limit is per task, not per call.** Twenty calls under the limit that add\n  up to more than it are above the limit. Don't split a job to stay under it.\n- **An approval covers its estimate, not a blank cheque.** If actual spend is on\n  track to pass the approved figure by more than the re-approval margin, stop,\n  report spend so far, and ask again.\n- **When there's more than one way to do it, price each one.** If two or more models\n  or providers could do the job, and the price gap is material, list each\n  option with its estimated cost and what you'd lose by picking the cheaper one.\n  Do this below the limit too: there, pick one and say why. Above the limit, it\n  goes into the question.\n- **Know the price before you spend.** Look up the current unit price. Don't quote it\n  from memory. If you can't establish it, treat the job as above the limit.\n- **Measure, don't guess.** Count tokens. Before any bulk job, run a small pilot\n  (around 100 items) and use its real cost per item to estimate the full run.\n  Reasoning models bill mostly on output, so budget output and thinking tokens as\n  well as input.\n- **Prove the request shape cheaply.** Send one synchronous request in the exact shape\n  you plan to use before submitting a batch. A failed batch wastes the money and\n  the time.\n- **Prefer the cheapest route that does the job:** batch APIs over realtime,\n  small fast models for bulk labelling, and a local model when one is available.\n- **Unattended, the limit is a hard ceiling.** With no one to ask, do the part that\n  fits within the limit, stop, and leave the estimate for the rest.\n- **Report spend per service** at the end of every task that spent anything, and say\n  which figures you measured and which you estimated.",
+      "added": "2026-10-22",
+      "status": "active",
+      "source": "conversation, 2026-10-22; first published as danielrosehill/Claude-Spend-Approval-Limit",
+      "related": [
+        "verify-dont-infer",
+        "own-capabilities-first"
+      ],
+      "variables": {
+        "APPROVAL_LIMIT": "$5",
+        "REAPPROVAL_MARGIN": "25%"
+      },
+      "template": "**Approval limit: {{APPROVAL_LIMIT}} per task. Re-approval margin: {{REAPPROVAL_MARGIN}}.**\n\nAny call billed per use is real money: LLM APIs, search and scraping APIs,\nimage, audio and video generation, GPU time, batch jobs. Flat-rate subscriptions\nthat are already paid for don't count. You hold delegated spending authority,\nthe way an employee holds a signing limit. Inside the limit you act. Above it you\nask.\n\n- **Up to the limit: go ahead.** Don't ask. Still estimate before you start, and\n  report what you spent at the end.\n- **Above the limit: estimate first and ask.** Give the figure and its basis\n  (requests × tokens × unit price, or units × rate), and the cheaper route if there\n  is one. Wait for an answer before spending.\n- **The limit is per task, not per call.** Twenty calls under the limit that add\n  up to more than it are above the limit. Don't split a job to stay under it.\n- **An approval covers its estimate, not a blank cheque.** If actual spend is on\n  track to pass the approved figure by more than the re-approval margin, stop,\n  report spend so far, and ask again.\n- **When there's more than one way to do it, price each one.** If two or more models\n  or providers could do the job, and the price gap is material, list each\n  option with its estimated cost and what you'd lose by picking the cheaper one.\n  Do this below the limit too: there, pick one and say why. Above the limit, it\n  goes into the question.\n- **Know the price before you spend.** Look up the current unit price. Don't quote it\n  from memory. If you can't establish it, treat the job as above the limit.\n- **Measure, don't guess.** Count tokens. Before any bulk job, run a small pilot\n  (around 100 items) and use its real cost per item to estimate the full run.\n  Reasoning models bill mostly on output, so budget output and thinking tokens as\n  well as input.\n- **Prove the request shape cheaply.** Send one synchronous request in the exact shape\n  you plan to use before submitting a batch. A failed batch wastes the money and\n  the time.\n- **Prefer the cheapest route that does the job:** batch APIs over realtime,\n  small fast models for bulk labelling, and a local model when one is available.\n- **Unattended, the limit is a hard ceiling.** With no one to ask, do the part that\n  fits within the limit, stop, and leave the estimate for the rest.\n- **Report spend per service** at the end of every task that spent anything, and say\n  which figures you measured and which you estimated."
     },
     {
       "id": "explain-less-do-more",

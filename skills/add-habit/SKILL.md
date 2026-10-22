@@ -57,6 +57,12 @@ State the exception explicitly where one exists. A prohibition with no carve-out
 over-applied: `ship-without-asking` had to say that deletion and outward-facing
 actions are excluded, or it would read as licence to push anything anywhere.
 
+If the habit has a value a user would reasonably tune, such as a threshold, a limit
+or a count, don't hard-code it. Declare it under `variables:` in the frontmatter
+(`NAME: "default"  # meaning`) and write `{{NAME}}` in the snippet. State the value
+once, prominently, near the top of the snippet, so the agent reading the prompt sees
+the number in force. Users override it with `install.py --set NAME=VALUE`.
+
 `order`: practices before prohibitions, documentation habits first. Use multiples of
 ten so a habit can be inserted later without renumbering.
 

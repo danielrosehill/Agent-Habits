@@ -4,8 +4,14 @@
 Each habit file is frontmatter, then a `## Snippet` section (the text destined for a
 system prompt) and a `## Why` section (rationale, for me, excluded from output).
 
+A habit may declare tunable values in a nested `variables:` block and reference them
+in its snippet as `{{NAME}}`. The assembled snippet carries the defaults; the raw
+template and the defaults are also written to habits.json so install.py can render
+other values.
+
 No third-party dependencies on purpose — this has to run anywhere without a venv, so
-the frontmatter parser handles only the scalar and inline-list forms actually used.
+the frontmatter parser handles only the scalar, inline-list and one-level
+`variables:` mapping forms actually used.
 """
 
 import json
@@ -18,6 +24,15 @@ HABITS = ROOT / "habits"
 OUT = ROOT / "assembled"
 
 SCALARS = ("id", "title", "stance", "added", "status", "source")
+PLACEHOLDER = re.compile(r"\{\{([A-Z][A-Z0-9_]*)\}\}")
+
+
+def unquote(value):
+    return value.strip().strip('"').strip("'")
+
+
+def render(template, values):
+    return PLACEHOLDER.sub(lambda m: values[m.group(1)], template)
 
 
 def parse(path):
@@ -27,9 +42,19 @@ def parse(path):
     _, fm, body = text.split("---\n", 2)
 
     meta = {}
+    block = None
     for line in fm.splitlines():
         if not line.strip() or line.lstrip().startswith("#"):
             continue
+        if line[0] in " \t":
+            if block != "variables":
+                sys.exit(f"{path.name}: indented line outside a variables block")
+            name, _, value = line.strip().partition(":")
+            # values are quoted, so a trailing '# comment' is safe to strip
+            value = re.sub(r"\s+#.*$", "", value.strip())
+            meta["variables"][name.strip()] = unquote(value)
+            continue
+        block = None
         key, _, value = line.partition(":")
         key, value = key.strip(), value.strip()
         if value.startswith("[") and value.endswith("]"):
@@ -37,6 +62,9 @@ def parse(path):
             meta[key] = [v.strip() for v in inner.split(",") if v.strip()]
         elif key == "order":
             meta[key] = int(value)
+        elif key == "variables" and not value:
+            meta[key] = {}
+            block = "variables"
         else:
             meta[key] = value.strip('"').strip("'")
 
@@ -54,7 +82,16 @@ def parse(path):
     if "snippet" not in sections:
         sys.exit(f"{path.name}: no '## Snippet' section")
 
-    meta["snippet"] = sections["snippet"]
+    template = sections["snippet"]
+    variables = meta.get("variables", {})
+    used = set(PLACEHOLDER.findall(template))
+    if used - variables.keys():
+        sys.exit(f"{path.name}: undeclared variable(s): {', '.join(sorted(used - variables.keys()))}")
+    if variables.keys() - used:
+        sys.exit(f"{path.name}: unused variable(s): {', '.join(sorted(variables.keys() - used))}")
+    if variables:
+        meta["template"] = template
+    meta["snippet"] = render(template, variables)
     meta["why"] = sections.get("why", "")
     return meta
 
@@ -91,6 +128,7 @@ def main():
         "habits": [
             {k: h[k] for k in ("id", "title", "stance", "order", "snippet") if k in h}
             | {k: h[k] for k in ("added", "status", "source", "related") if k in h}
+            | {k: h[k] for k in ("variables", "template") if k in h}
             for h in habits
         ],
     }
