@@ -1,46 +1,36 @@
 ---
 name: add-habit
-description: Add a new habit to Habits-Of-Claude — writes habits/<id>.md with frontmatter, one-line summary, snippet and rationale, then rebuilds, installs into ~/CLAUDE.md and the habits folder, and pushes. Use when the user states a standing preference or principle that should hold across all work and projects ("from now on, always…", "my preference for X is…"), or corrects the agent in a way that should persist.
+description: Add a new habit to your own habits — a standing rule for how the agent should behave across all work, or whenever a stated trigger applies — with a one-line summary that sits in every session. Writes ~/.claude-user-data/habits/<id>.md, reinstalls the CLAUDE.md block and syncs. Use when the user states a standing preference or principle ("from now on, always…", "my preference for X is…") or corrects the agent in a way that should persist. For an ordered procedure use sop-write; to take one from the example library use adopt-habit.
 ---
 
 # Add a habit
 
-Work in the Habits-Of-Claude clone. With `${CLAUDE_PLUGIN_ROOT}` unset, its path is
-`source_repo` in `~/.config/agent-habits/index.json`; failing that, clone
-`danielrosehill/Habits-Of-Claude`. `git pull` first. To change an existing habit use
-`update-habit`, and to drop one use `remove-habit`.
+Scripts are in `$PLUGIN/scripts/`. `$PLUGIN` is `${CLAUDE_PLUGIN_ROOT}` when that is set, otherwise the plugin's local clone: `plugin_repo` in `~/.claude-user-data/habits/index.json`, or `gh repo clone danielrosehill/Agent-Habits`. Your habits are in `~/.claude-user-data/habits/` (`$CLAUDE_USER_DATA` overrides the root).
 
-## Qualify it first
+## Qualify it
 
-A habit is a principle that should be in force before the task is known, in any
-repository, on any machine. Three things it is not:
+Read [`references/habit-or-sop.md`](../../references/habit-or-sop.md). In short:
 
-- **Environment configuration** — which server fronts a tool, what a hostname means,
-  which package manager this machine uses. Belongs in `~/CLAUDE.md`.
-- **A workflow** — an ordered procedure for a specific job. Belongs in a skill.
-- **A one-off correction** — a preference about the task at hand, not about all work.
+- **Steps?** Then it's an SOP. Use `sop-write`.
+- **A fact about this machine?** It goes in CLAUDE.md, not here.
+- **Close to an existing habit** (`habits.py list`)? Then use `update-habit`. Two
+  overlapping habits will drift apart into two different rules.
+- **Already in the library** (`habits.py list --library`)? Then use `adopt-habit`.
 
-The test in the repo README: if it would still be true working on someone else's
-machine, on an unfamiliar codebase, it is a habit.
-
-If what the user said is close to an existing habit (`python3 scripts/list.py`),
-revise that file with `update-habit` rather than adding a near-duplicate. Two habits that overlap will eventually contradict.
-
-## Write the file
-
-`habits/<id>.md`, where `<id>` matches the filename exactly — `assemble.py` enforces
-this. Imperative slug, no numbering in the name; order is a frontmatter field.
+## Write `~/.claude-user-data/habits/<id>.md`
 
 ```markdown
 ---
-id: <slug>
+id: <slug, equals the filename>
 title: <short imperative title>
-summary: "<the rule in one or two sentences, under 320 characters>"
+summary: "<the rule in one or two sentences, under 320 characters, no double quotes>"
+kind: habit
+trigger: "<only if it applies to one kind of task: cutting a release, …>"
 stance: practice | prohibition
-order: <multiple of 10, leaving gaps>
-added: <absolute date, YYYY-MM-DD>
+order: <multiple of 10; practices before prohibitions>
+added: <YYYY-MM-DD>
 status: active
-source: "where this came from — a CLAUDE.md section, or a conversation with its date"
+source: "conversation, <YYYY-MM-DD>"
 related: [<other habit ids>]
 ---
 
@@ -49,44 +39,26 @@ related: [<other habit ids>]
 ## Why
 ```
 
-`## Snippet` is addressed to the agent in the second person and is what lands in a
-system prompt — so it must stand alone, with no reference to this repo, to "the user's
-preference", or to the conversation it came from. Write the rule and what it means in
-practice, not the argument for it.
+- **`## Snippet`** is the full rule, read on demand. It is addressed to the agent,
+  stands alone, and says nothing about the conversation it came from. State any
+  exception explicitly. A rule with no carve-out gets over-applied.
+- **`summary`** is the only part every session sees, so it must carry the rule and
+  its main exception by itself. Write the snippet first, then compress it.
+- **`trigger`** describes the circumstance, not the action ("cutting a release",
+  not "versioning"). Leave it out for a rule that holds on every task.
+- **`## Why`** holds the reasoning and the cost of getting it wrong. It is what
+  lets the habit be judged later instead of just obeyed.
+- Prefer the user's own wording to a paraphrase.
 
-`summary` is the line that sits in every session's `~/CLAUDE.md`; the snippet is only
-read on demand. So the summary must carry the rule on its own, including the main
-exception. Write the snippet first, then compress it. No double quotes inside it.
-
-`## Why` is the argument, addressed to the user, and is excluded from the assembled
-output. Put the reasoning and the cost of getting it wrong here. It is what makes the
-habit revisable in a year instead of merely inherited — a habit whose rationale is
-lost cannot be judged, only obeyed.
-
-State the exception explicitly where one exists. A prohibition with no carve-out gets
-over-applied: `ship-without-asking` had to say that deletion and outward-facing
-actions are excluded, or it would read as licence to push anything anywhere.
-
-If the habit has a value a user would reasonably tune, such as a threshold, a limit
-or a count, don't hard-code it. Declare it under `variables:` in the frontmatter
-(`NAME: "default"  # meaning`) and write `{{NAME}}` in the snippet. State the value
-once, prominently, near the top of the snippet, so the agent reading the prompt sees
-the number in force. Users override it with `install.py --set NAME=VALUE`.
-
-`order`: practices before prohibitions, documentation habits first. Use multiples of
-ten so a habit can be inserted later without renumbering.
-
-## Then apply
+## Apply
 
 ```bash
-python3 scripts/assemble.py          # validates; exits non-zero on a broken habit
-python3 scripts/install.py --write   # ~/CLAUDE.md line + ~/.config/agent-habits/<id>.md
-python3 scripts/check.py             # source + context must both be ok
-git add habits assembled && git commit -m "Add habit <id>: <one line>" && git push
+python3 "$PLUGIN/scripts/habits.py" validate
+python3 "$PLUGIN/scripts/habits.py" install            # dry run: check the changed line
+python3 "$PLUGIN/scripts/habits.py" install --write
+python3 "$PLUGIN/scripts/habits.py" check
 ```
 
-`assemble.py` validates frontmatter, that `id` matches the filename, `stance` and
-`status` values, the summary, variables, and that every `related` id resolves. Add
-the habit to the table in `README.md` in the same commit.
+Then commit with `sync`. Changes reach new sessions, not the running one. Say so.
 
-Changes reach new sessions, not the running one. Say so.
+If the habit is generic enough that others might want it, offer `share-habit`.

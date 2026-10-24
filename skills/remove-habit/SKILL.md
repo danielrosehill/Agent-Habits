@@ -1,42 +1,39 @@
 ---
 name: remove-habit
-description: Retire a habit from Habits-Of-Claude so it stops being installed, or delete it outright when explicitly asked — then rebuild, reinstall and push. Use when the user says to drop, remove, delete, retire or stop applying a habit.
+description: Retire one of your habits so it stops being installed, or delete it outright when explicitly asked — then reinstall the CLAUDE.md block and sync. Use when the user says to drop, remove, delete, retire or stop applying a habit.
 ---
 
 # Remove a habit
 
-Work in the Habits-Of-Claude clone. With `${CLAUDE_PLUGIN_ROOT}` unset, its path is
-`source_repo` in `~/.config/agent-habits/index.json`; failing that, clone
-`danielrosehill/Habits-Of-Claude`. `git pull` first.
+Scripts are in `$PLUGIN/scripts/`. `$PLUGIN` is `${CLAUDE_PLUGIN_ROOT}` when that is set, otherwise the plugin's local clone: `plugin_repo` in `~/.claude-user-data/habits/index.json`, or `gh repo clone danielrosehill/Agent-Habits`. Your habits are in `~/.claude-user-data/habits/` (`$CLAUDE_USER_DATA` overrides the root).
 
 ## Retire by default
 
-"Drop it", "remove it", "stop doing that" mean retire:
+"Drop it", "remove it" and "stop doing that" mean retire:
 
-1. In `habits/<id>.md` set `status: retired` and add `revised: YYYY-MM-DD`.
-2. In `## Why`, add a dated line saying why it was dropped. A retired habit records
-   a position that was considered and rejected; that is worth keeping.
-3. Other active habits that list it in `related:` should drop the reference.
-   `check.py source` warns about any that still do.
+1. In `habits/<id>.md`, set `status: retired` and `revised: YYYY-MM-DD`.
+2. Add a dated line to `## Why` saying why. A retired habit records a position that
+   was considered and dropped.
+3. Remove it from other habits' `related:` lists. `check` warns about any left.
 
-Retired habits stay in `assembled/habits.json` with their status, are left out of
-`assembled/habits.md`, and are never installed. `install.py --write` removes the
-habit's file from the habits folder and its line from `~/CLAUDE.md`.
+Retired habits stay in `index.json` and are never installed.
 
-## Delete only on an explicit request
+## Delete only when asked explicitly
 
-If the user says to delete the file, or the habit was a mistake with nothing worth
-recording, `git rm habits/<id>.md` and remove every `related:` reference to it, since
-`assemble.py` fails on a dangling one. Git history still holds it.
+If the user says to delete the file: `git -C ~/.claude-user-data rm habits/<id>.md`,
+and remove every `related:` reference to it, since `validate` fails on a dangling
+one.
 
 ## Apply
 
 ```bash
-python3 scripts/assemble.py
-python3 scripts/install.py --write
-python3 scripts/check.py
-git add -A habits assembled && git commit -m "Retire <id>: <reason>" && git push
+python3 "$PLUGIN/scripts/habits.py" validate
+python3 "$PLUGIN/scripts/habits.py" install            # dry run: check the changed line
+python3 "$PLUGIN/scripts/habits.py" install --write
+python3 "$PLUGIN/scripts/habits.py" check
 ```
 
-If prose elsewhere in `~/CLAUDE.md` restates the removed habit, say so. Removing it
-is the user's call, through `reconcile-habits`.
+Then commit with `sync`. Changes reach new sessions, not the running one. Say so.
+
+If prose elsewhere in CLAUDE.md restates the removed habit, point it out. Removing
+that prose is the user's call; use `reconcile-habits`.

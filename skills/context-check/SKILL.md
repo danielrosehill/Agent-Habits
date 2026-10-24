@@ -1,56 +1,59 @@
 ---
 name: context-check
-description: Verify the user-level system prompt is wired to the habits correctly — ~/CLAUDE.md has one short generated Habits block in index mode that lists every active habit and points at the habits folder, and the folder holds exactly the current generated files. Repairs drift by reinstalling. Use when asked to "check the context", after adding or removing habits, after hand-editing ~/CLAUDE.md, or when a habit seems not to be in force.
+description: Verify the user-level CLAUDE.md is wired correctly to your habits and SOPs — exactly one generated agent-habits block, in index mode, under its size budget, matching the current habit and SOP files, with no legacy or hand-written duplicates — and repair drift by reinstalling. Use when asked to "check the context", after adding or removing habits or SOPs, after hand-editing CLAUDE.md, after a pull on another machine, or when a habit seems not to be in force.
 ---
 
 # Context check
 
-The intended shape: `~/CLAUDE.md` holds a short marker-delimited `## Habits` block
-with one summary line per habit and a pointer to the habits folder (default
-`~/.config/agent-habits/`). The folder holds one generated `<id>.md` per active habit
-plus `index.json`. The full rules live in the folder and the block stays small.
+Scripts are in `$PLUGIN/scripts/`. `$PLUGIN` is `${CLAUDE_PLUGIN_ROOT}` when that is set, otherwise the plugin's local clone: `plugin_repo` in `~/.claude-user-data/habits/index.json`, or `gh repo clone danielrosehill/Agent-Habits`. Your habits are in `~/.claude-user-data/habits/` (`$CLAUDE_USER_DATA` overrides the root).
 
-Work in the Habits-Of-Claude clone (`source_repo` in
-`~/.config/agent-habits/index.json`, or clone `danielrosehill/Habits-Of-Claude`).
+The intended shape is one marker-delimited block in `~/CLAUDE.md`
+(`<!-- agent-habits:begin -->` … `:end -->`) with two parts:
+
+- **`## Habits`**: one summary line per active habit. Triggered habits are grouped
+  under "These apply only when their trigger does". It points at
+  `~/.claude-user-data/habits/<id>.md` for the full text.
+- **`## Procedures`**: one trigger line per active SOP, pointing at
+  `~/.claude-user-data/sops/<id>.md`.
 
 ## Run
 
 ```bash
-python3 scripts/check.py context            # or --target <file> --json
+python3 "$PLUGIN/scripts/habits.py" check context      # --target <file>, --json
 ```
 
 It fails when:
 
-- there isn't exactly one `<!-- habits-of-claude:begin/end -->` pair
-- the block is inline mode, meaning full snippets, with no folder pointer
-- the block is over its size budget, 6,000 characters
-- an active habit has no line, or a line names a habit that isn't active
-- the block text differs from what `install.py` would write now
-- the folder is missing, or one of its generated files is missing, stale, or left
-  over from a removed habit
-- a hand-written `## Habits` heading exists outside the block
-
-It warns, without failing, on a hand-written file inside the folder.
+- there isn't exactly one block;
+- a legacy `habits-of-claude` or `claude-sops` block remains;
+- the block is in inline mode or has no `## Procedures` part;
+- the block is over its 7,000-character budget;
+- the block differs from what `install` would write now from the habit and SOP
+  files (a habit or SOP was added, changed, retired or pulled without
+  reinstalling);
+- `habits/index.json` is missing;
+- a hand-written `## Habits` or `## Procedures` heading sits outside the block.
 
 ## Repair
 
-Most failures are a stale install:
-
 ```bash
-python3 scripts/assemble.py && python3 scripts/install.py --write && python3 scripts/check.py context
+python3 "$PLUGIN/scripts/habits.py" install --write && python3 "$PLUGIN/scripts/habits.py" check context
 ```
 
-Inline mode on `~/CLAUDE.md`: the same command, since index is the default, converts
-it. Duplicate markers or hand-written habit prose: don't fix those mechanically. Show
-the user the text and use `reconcile-habits`.
+That fixes staleness, legacy blocks and inline mode. Don't repair a duplicate
+marker or hand-written habit prose mechanically. Show the user the text and use
+`reconcile-habits`.
 
-## Also read, don't just run
+Over budget means too many always-on habits. Suggest giving some a `trigger`, or
+retiring or merging some, rather than raising the budget.
 
-The script checks structure. Two things it can't:
+## Also read it
 
-- Text outside the block should refer to it correctly. If the header names the
-  source repo or says the block is generated, check that it's still true.
-- A behavioural directive written above the block by hand belongs in a habit. Flag
-  it and offer `add-habit`.
+The script checks structure. Read the text around the block too:
 
-Report pass/fail per check in a line or two. If you repaired anything, say what.
+- the header should describe the block correctly;
+- a behavioural directive written above it by hand belongs in a habit (offer
+  `add-habit`);
+- a numbered procedure written above it belongs in an SOP (offer `sop-write`).
+
+Report pass or fail in a line or two, and what you repaired.
