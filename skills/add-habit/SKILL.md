@@ -1,9 +1,14 @@
 ---
 name: add-habit
-description: Add a new habit to Habits-Of-Claude, or revise or retire an existing one — writes habits/<id>.md with correct frontmatter, snippet and rationale, then regenerates the assembled output. Use when the user states a standing principle they want to hold across all work, corrects the agent in a way that should persist, or asks to change or drop a habit.
+description: Add a new habit to Habits-Of-Claude — writes habits/<id>.md with frontmatter, one-line summary, snippet and rationale, then rebuilds, installs into ~/CLAUDE.md and the habits folder, and pushes. Use when the user states a standing preference or principle that should hold across all work and projects ("from now on, always…", "my preference for X is…"), or corrects the agent in a way that should persist.
 ---
 
-# Add or revise a habit
+# Add a habit
+
+Work in the Habits-Of-Claude clone. With `${CLAUDE_PLUGIN_ROOT}` unset, its path is
+`source_repo` in `~/.config/agent-habits/index.json`; failing that, clone
+`danielrosehill/Habits-Of-Claude`. `git pull` first. To change an existing habit use
+`update-habit`, and to drop one use `remove-habit`.
 
 ## Qualify it first
 
@@ -18,8 +23,8 @@ repository, on any machine. Three things it is not:
 The test in the repo README: if it would still be true working on someone else's
 machine, on an unfamiliar codebase, it is a habit.
 
-If what the user said is close to an existing habit, revise that file rather than
-adding a ninth near-duplicate. Two habits that overlap will eventually contradict.
+If what the user said is close to an existing habit (`python3 scripts/list.py`),
+revise that file with `update-habit` rather than adding a near-duplicate. Two habits that overlap will eventually contradict.
 
 ## Write the file
 
@@ -30,6 +35,7 @@ this. Imperative slug, no numbering in the name; order is a frontmatter field.
 ---
 id: <slug>
 title: <short imperative title>
+summary: "<the rule in one or two sentences, under 320 characters>"
 stance: practice | prohibition
 order: <multiple of 10, leaving gaps>
 added: <absolute date, YYYY-MM-DD>
@@ -47,6 +53,10 @@ related: [<other habit ids>]
 system prompt — so it must stand alone, with no reference to this repo, to "the user's
 preference", or to the conversation it came from. Write the rule and what it means in
 practice, not the argument for it.
+
+`summary` is the line that sits in every session's `~/CLAUDE.md`; the snippet is only
+read on demand. So the summary must carry the rule on its own, including the main
+exception. Write the snippet first, then compress it. No double quotes inside it.
 
 `## Why` is the argument, addressed to the user, and is excluded from the assembled
 output. Put the reasoning and the cost of getting it wrong here. It is what makes the
@@ -66,23 +76,17 @@ the number in force. Users override it with `install.py --set NAME=VALUE`.
 `order`: practices before prohibitions, documentation habits first. Use multiples of
 ten so a habit can be inserted later without renumbering.
 
-## Then regenerate
+## Then apply
 
 ```bash
-python3 scripts/assemble.py
+python3 scripts/assemble.py          # validates; exits non-zero on a broken habit
+python3 scripts/install.py --write   # ~/CLAUDE.md line + ~/.config/agent-habits/<id>.md
+python3 scripts/check.py             # source + context must both be ok
+git add habits assembled && git commit -m "Add habit <id>: <one line>" && git push
 ```
 
-This validates frontmatter, that `id` matches the filename, that `stance` is one of
-the two allowed values, and that every `related` id resolves. Fix what it reports —
-it exits non-zero rather than emitting a broken build.
+`assemble.py` validates frontmatter, that `id` matches the filename, `stance` and
+`status` values, the summary, variables, and that every `related` id resolves. Add
+the habit to the table in `README.md` in the same commit.
 
-Commit the habit file and the regenerated `assembled/` together. Installing into
-`~/CLAUDE.md` is a separate step: use `install-habits`.
-
-## Retiring one
-
-Set `status: retired` and leave the file in place rather than deleting it — the
-rationale is the useful part and a retired habit records a position that was
-considered and dropped. Note in `## Why` what changed. Retired habits are still
-assembled today; if that becomes unwanted, filter on `status` in `assemble.py` rather
-than deleting history.
+Changes reach new sessions, not the running one. Say so.

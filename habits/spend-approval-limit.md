@@ -1,6 +1,7 @@
 ---
 id: spend-approval-limit
 title: Spend within your approval limit
+summary: "Per-use billed calls: up to **{{APPROVAL_LIMIT}} per task** act, then report spend; above it, estimate with its basis and ask. Re-ask before overrunning an approval by more than {{REAPPROVAL_MARGIN}}. Look prices up; pilot before bulk."
 stance: practice
 order: 78
 added: 2026-10-22

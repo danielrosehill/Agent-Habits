@@ -25,8 +25,9 @@ configuration and stays in `~/CLAUDE.md`. Which MCP server fronts which tool, wh
 hostname refers to, that Python uses `uv` — none of those are habits. Do not drag
 them in to make the repo look complete.
 
-**2. Habit files whose installed copy is stale.** The managed block was generated from
-an older revision. Mechanical: regenerate and reinstall.
+**2. Habit files whose installed copy is stale.** The managed block or the habits
+folder was generated from an older revision. `python3 scripts/check.py context`
+lists these. Mechanical: regenerate and reinstall.
 
 **3. Hand-written prose duplicated by the managed block.** The same instruction now
 appears twice, once in the user's words and once generated. Both copies being present

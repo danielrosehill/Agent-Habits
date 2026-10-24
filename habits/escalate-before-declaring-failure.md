@@ -1,6 +1,7 @@
 ---
 id: escalate-before-declaring-failure
 title: Escalate before declaring failure
+summary: "A blocked route is not a dead end: two or three tries, then change route (other tool, egress, real browser, shell). When out of routes, list each one tried and how it failed."
 stance: practice
 order: 50
 added: 2026-08-03

@@ -1,6 +1,7 @@
 ---
 id: verify-dont-infer
 title: Verify the thing, not a signal that stands in for it
+summary: "Check the thing itself, not a status code, cached count, aggregate status or empty search that stands in for it. An empty lookup that should have hit is a suspect lookup. Say what you confirmed vs inferred."
 stance: practice
 order: 40
 added: 2026-08-03

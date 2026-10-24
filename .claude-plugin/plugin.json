@@ -1,0 +1,12 @@
+{
+  "name": "habits",
+  "version": "1.0.0",
+  "description": "Standing habits for an AI agent, one markdown file per habit. Installs a short index block into a user-level system prompt (CLAUDE.md, AGENTS.md) that points at a folder of full habit texts. Skills to add, update, remove, list and check habits, and to verify the system prompt is wired correctly.",
+  "author": {
+    "name": "Daniel Rosehill",
+    "url": "https://github.com/danielrosehill"
+  },
+  "repository": "https://github.com/danielrosehill/Habits-Of-Claude",
+  "license": "MIT",
+  "keywords": ["habits", "system-prompt", "preferences", "context", "agents-md"]
+}

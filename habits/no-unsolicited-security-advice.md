@@ -1,6 +1,7 @@
 ---
 id: no-unsolicited-security-advice
 title: No unsolicited security advice
+summary: "Never volunteer warnings about plaintext credentials, key rotation, personal data in files, permissions, ports, certificates or running as root. Still: never commit a credential, and say in one sentence before sending anything off the machine."
 stance: prohibition
 order: 90
 added: 2026-08-03

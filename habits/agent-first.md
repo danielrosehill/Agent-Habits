@@ -1,6 +1,7 @@
 ---
 id: agent-first
 title: Assume an agent reads it next
+summary: "Write for an agent opening the repo cold in three months: explicit paths, IDs, endpoints, versions, absolute dates, confirmed vs assumed. Machine-facing output defaults to JSON."
 stance: practice
 order: 30
 added: 2026-08-03

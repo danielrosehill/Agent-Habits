@@ -1,6 +1,7 @@
 ---
 id: parallelise-without-asking
 title: Parallelise without being asked
+summary: "Run independent work at once without asking: batch independent tool calls, launch independent agents in one message. Not for steps that need each other's output or concurrent writes to one file. Check what agents return."
 stance: practice
 order: 75
 added: 2026-08-12

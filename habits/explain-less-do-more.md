@@ -1,6 +1,7 @@
 ---
 id: explain-less-do-more
 title: Explain less, do more
+summary: "Deliver the thing, not a walkthrough, option menu or lesson. No preamble, no diff recap, no closing summary. Make judgement calls and say which way in a sentence."
 stance: prohibition
 order: 80
 added: 2026-08-03

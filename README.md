@@ -2,8 +2,9 @@
 
 # Habits Of Claude
 
-Standing habits for an AI coding agent, one file per habit, kept as paste-ready
-snippets for a user-level system prompt (`~/CLAUDE.md`, `AGENTS.md`).
+Standing habits for an AI coding agent, one file per habit, installed into a
+user-level system prompt (`~/CLAUDE.md`, `AGENTS.md`) as a short index that points at
+a folder of the full texts. Also packaged as an agent-skills plugin, `habits`.
 
 The unit here is the **habit**: a principle that should hold across every piece of
 work, in every repository, public or private, regardless of the task in front of it.
@@ -36,9 +37,37 @@ maintains a marker-delimited region and leaves everything around it alone:
 ```bash
 python3 scripts/install.py                     # dry run — prints the diff
 python3 scripts/install.py --write             # backs the target up first
-python3 scripts/install.py --only agent-first,verify-dont-infer --target ./CLAUDE.md --write
+python3 scripts/check.py                       # validate source and installed context
+python3 scripts/install.py --mode inline --only agent-first,verify-dont-infer --target ./CLAUDE.md --write
 python3 scripts/install.py --set APPROVAL_LIMIT='$20' --write   # tune a habit variable
 ```
+
+### Index mode (default) and inline mode
+
+Inlining every snippet put ~18,500 characters (~4,600 tokens) into every session.
+Since 2026-10-24 the default is **index mode**:
+
+- The prompt's block holds one line per active habit: `**Title** (`id`): summary`,
+  taken from the habit's `summary:` frontmatter, about 4,200 characters for 14 habits.
+- The full snippets go to `~/.config/agent-habits/<id>.md`, plus an `index.json`
+  that lists them and records `source_repo` (this clone's path), so a skill can
+  find the repo from the installed folder. The folder is vendor-neutral on purpose,
+  so any agent can read it, not only Claude Code.
+- The agent reads a habit's file when a task falls squarely under it. The summary
+  line is the rule that is always in force, so it must carry the main exception
+  itself.
+
+`--habits-dir` picks another folder. The choice is recorded in the block as
+`<!-- habits-of-claude:dir … -->` and reused on reinstall. Generated files carry a
+`<!-- habits-of-claude:generated` header. Only those are pruned when a habit is
+retired, and `--only` never prunes.
+
+`--mode inline` writes full snippets into the block, as before. Use it for project
+files other people read, where a path into one user's home means nothing.
+
+`scripts/check.py context` verifies the wiring: one block, index mode, under a
+6,000-character budget, a line for every active habit, and a folder matching what
+`install.py` would write now. It exits 1 on any failure.
 
 Some habits have values you can tune, such as the spend limit in `spend-approval-limit`.
 `--set NAME=VALUE` overrides a value, and the flag can be repeated. The values used
@@ -46,13 +75,21 @@ are recorded in a comment inside the installed block, so a later reinstall witho
 `--set` keeps them. A value with no override and no recorded entry falls back to the
 default in the habit's frontmatter.
 
-Three skills drive this, in `skills/`:
+Skills, in `skills/` (plugin `habits`). The plugin isn't installed; it's reached
+through the skill catalogue, so `${CLAUDE_PLUGIN_ROOT}` is unset. Each skill runs
+the scripts from a local clone of this repo, found through `source_repo` in
+`~/.config/agent-habits/index.json`.
 
 | Skill | For |
 |---|---|
-| `install-habits` | Install or update the block — all habits or a named subset |
-| `reconcile-habits` | Resolve drift when the prompt and the repo disagree |
-| `add-habit` | Add, revise or retire a habit with valid frontmatter |
+| `add-habit` | Add a habit with valid frontmatter and summary, install, push |
+| `update-habit` | Revise a habit's rule, summary or default values |
+| `remove-habit` | Retire a habit (default) or delete it on explicit request |
+| `list-habits` | List habits, or find which one covers something |
+| `check-habits` | Validate the source: build, summary fidelity, overlap, contradiction |
+| `context-check` | Verify `~/CLAUDE.md` and the habits folder are wired correctly; repair |
+| `install-habits` | Install or update the block — index or inline, all or a subset |
+| `reconcile-habits` | Resolve drift when hand-written prompt prose and the repo disagree |
 
 ## The habits
 
@@ -67,6 +104,7 @@ Three skills drive this, in `skills/`:
 | [`one-subject-one-repo`](habits/one-subject-one-repo.md) | practice | Knowledge gets its own home, at maximum specificity |
 | [`skill-or-not`](habits/skill-or-not.md) | practice | Before a task, ask whether it should become a skill |
 | [`ship-without-asking`](habits/ship-without-asking.md) | practice | Finished means deployed, not committed |
+| [`release-versioning`](habits/release-versioning.md) | practice | Releases are `v1.000`, `v1.001`, … — not semver |
 | [`parallelise-without-asking`](habits/parallelise-without-asking.md) | practice | Spawn the agent, don't propose it |
 | [`spend-approval-limit`](habits/spend-approval-limit.md) | practice | Spend freely below a set limit; estimate and ask above it |
 | [`explain-less-do-more`](habits/explain-less-do-more.md) | prohibition | Do the work; instruct only when asked to |
@@ -97,13 +135,17 @@ that standing dispositions are the useful unit.
 
 ```
 habits/         One markdown file per habit — frontmatter + snippet + rationale
-skills/         Claude Code skills — install, reconcile, add
-scripts/        assemble.py builds the output; install.py splices it into a prompt
+skills/         Agent skills — add, update, remove, list, check, context-check, install, reconcile
+scripts/        assemble.py builds; install.py installs; check.py validates; list.py lists
 assembled/      Generated output, committed so it is usable without running anything
+.claude-plugin/ Plugin manifest (plugin name `habits`)
 ```
 
-Each habit file carries `id`, `title`, `stance`, `order`, `added`, `status` and
-`source` in frontmatter. `## Snippet` is the text that goes into a system prompt;
+Each habit file carries `id`, `title`, `summary`, `stance`, `order`, `added`,
+`status` (`active` or `retired`) and `source` in frontmatter, and `revised` once
+edited. `summary` is required for an active habit and capped at 320 characters,
+because it is what sits in every session. Retired habits stay in `habits.json` with
+their status, but are left out of `habits.md` and never installed. `## Snippet` is the text that goes into a system prompt;
 `## Why` is context for me and is excluded from the assembled output.
 
 A habit with tunable values also declares a `variables:` block, one level deep, with

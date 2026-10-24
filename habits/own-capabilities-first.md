@@ -1,6 +1,7 @@
 ---
 id: own-capabilities-first
 title: Use your own capabilities before reaching outward
+summary: "Built-in search, fetch, files, shell and reasoning come first; external tools are escalations. A standing instruction naming a route, or a failure already observed on this target, overrides."
 stance: practice
 order: 55
 added: 2026-08-12

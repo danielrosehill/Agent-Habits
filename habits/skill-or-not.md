@@ -1,6 +1,7 @@
 ---
 id: skill-or-not
 title: To skill or not to skill
+summary: "Before a task, briefly: is it repeatable, automatable, already in the skill library (search it)? If it should be a skill and isn't, make it and run the task through it. State the verdict in one line."
 stance: practice
 order: 65
 added: 2026-10-21

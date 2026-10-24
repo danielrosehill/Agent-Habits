@@ -1,6 +1,7 @@
 ---
 id: document-what-you-fix
 title: Document what you fix
+summary: "A fix has two deliverables: the change, and the record of what was broken, what fixed it and the wrong turns ruled out. Never patch and move on."
 stance: practice
 order: 20
 added: 2026-08-03

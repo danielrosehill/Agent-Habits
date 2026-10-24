@@ -1,6 +1,7 @@
 ---
 id: ship-without-asking
 title: Finished means shipped
+summary: "Once committed, push; don't ask per commit and skip local builds of sites that build on push. Deleting data, sending mail, publishing something private or anything with an audience still gets confirmed."
 stance: practice
 order: 70
 added: 2026-08-03

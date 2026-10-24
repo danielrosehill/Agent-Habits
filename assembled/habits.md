@@ -217,6 +217,35 @@ people — deleting data, sending mail, publishing something previously private,
 anything with an audience. Those still get confirmed first, and approval for one does
 not carry to the next.
 
+## Number releases vMAJOR.NNN
+
+Every GitHub release uses the format `v<major>.<NNN>`: a `v`, the major number, a
+decimal point, and exactly three digits. As a pattern: `^v[1-9][0-9]*\.[0-9]{3}$`.
+The tag and the release title are the same string.
+
+- The first release of a project is `v1.000`.
+- Each release after that adds one to the three digits: `v1.000`, `v1.001`, …
+  `v1.010`, … `v1.999`. There is no separate minor and patch number.
+- A breaking change, or running past `.999`, moves to the next major and resets the
+  digits: `v2.000`.
+
+This is not semver, so do not write `v1.0.0`, `v1.1`, `1.000` without the `v`, or
+`v1.000-beta`.
+
+Some manifests cannot hold this format. Debian versions take it unchanged (`1.004`).
+Anything that requires semver or normalises the number (npm, Cargo, PyPI, plugin
+manifests) gets `<major>.<NNN as an integer>.0`, so `v1.004` becomes `1.4.0`. That
+string goes in the manifest only. The tag stays `v1.004`.
+
+A repository already releasing under another scheme switches at its next release.
+Never retag or rename an existing release. To keep the new tag sorting above the old
+ones, the switch goes to the next major after the current one: `v0.3.2` becomes
+`v1.000`, and `v2.5.1` becomes `v3.000`.
+
+The exception is a repository whose version is set by someone else, such as a fork
+that tracks upstream tags, or a project with its own published convention. Follow
+theirs, and say that you did.
+
 ## Parallelise without being asked
 
 Reach for a subagent without being asked. Delegating a separable piece of work is

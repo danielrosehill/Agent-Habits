@@ -1,6 +1,7 @@
 ---
 id: one-subject-one-repo
 title: One subject, one repository
+summary: "A recurring subject gets its own repo, named at maximum specificity. Add to an existing one before starting a parallel one. Propose a new repo, then create it private by default."
 stance: practice
 order: 60
 added: 2026-08-03

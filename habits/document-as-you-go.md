@@ -1,6 +1,7 @@
 ---
 id: document-as-you-go
 title: Document as you go
+summary: "Capture what you had to reverse-engineer (undocumented APIs, auth flows, the steps that finally worked) without being asked: a subject repo if it recurs, `docs/` if project-only, the reply if one-off. Doc changes ship in the same commit. No SUMMARY.md or work logs."
 stance: practice
 order: 10
 added: 2026-08-03

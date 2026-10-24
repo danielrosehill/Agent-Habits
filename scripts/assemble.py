@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Build assembled/habits.md and assembled/habits.json from habits/*.md.
 
-Each habit file is frontmatter, then a `## Snippet` section (the text destined for a
+Each habit file is frontmatter (including a one-line `summary`, which is what the
+installed index block carries), then a `## Snippet` section (the text destined for a
 system prompt) and a `## Why` section (rationale, for me, excluded from output).
 
 A habit may declare tunable values in a nested `variables:` block and reference them
@@ -23,7 +24,9 @@ ROOT = Path(__file__).resolve().parent.parent
 HABITS = ROOT / "habits"
 OUT = ROOT / "assembled"
 
-SCALARS = ("id", "title", "stance", "added", "status", "source")
+SCALARS = ("id", "title", "summary", "stance", "added", "revised", "status", "source")
+STATUSES = ("active", "retired")
+SUMMARY_MAX = 320  # characters; the summary sits in every session's context
 PLACEHOLDER = re.compile(r"\{\{([A-Z][A-Z0-9_]*)\}\}")
 
 
@@ -75,6 +78,13 @@ def parse(path):
         sys.exit(f"{path.name}: id '{meta['id']}' does not match filename")
     if meta["stance"] not in ("practice", "prohibition"):
         sys.exit(f"{path.name}: stance must be practice or prohibition")
+    meta.setdefault("status", "active")
+    if meta["status"] not in STATUSES:
+        sys.exit(f"{path.name}: status must be one of {', '.join(STATUSES)}")
+    if meta["status"] == "active" and not meta.get("summary"):
+        sys.exit(f"{path.name}: active habit needs a 'summary'")
+    if len(meta.get("summary", "")) > SUMMARY_MAX:
+        sys.exit(f"{path.name}: summary is {len(meta['summary'])} chars, max {SUMMARY_MAX}")
 
     sections = {}
     for match in re.finditer(r"^## (.+?)\n(.*?)(?=^## |\Z)", body, re.S | re.M):
@@ -84,14 +94,17 @@ def parse(path):
 
     template = sections["snippet"]
     variables = meta.get("variables", {})
-    used = set(PLACEHOLDER.findall(template))
+    used = set(PLACEHOLDER.findall(template)) | set(PLACEHOLDER.findall(meta.get("summary", "")))
     if used - variables.keys():
         sys.exit(f"{path.name}: undeclared variable(s): {', '.join(sorted(used - variables.keys()))}")
     if variables.keys() - used:
         sys.exit(f"{path.name}: unused variable(s): {', '.join(sorted(variables.keys() - used))}")
     if variables:
         meta["template"] = template
+        meta["summary_template"] = meta.get("summary", "")
     meta["snippet"] = render(template, variables)
+    if "summary" in meta:
+        meta["summary"] = render(meta["summary"], variables)
     meta["why"] = sections.get("why", "")
     return meta
 
@@ -119,16 +132,18 @@ def main():
         "",
     ]
     for habit in habits:
-        md += [f"## {habit['title']}", "", habit["snippet"], ""]
+        if habit["status"] == "active":
+            md += [f"## {habit['title']}", "", habit["snippet"], ""]
     (OUT / "habits.md").write_text("\n".join(md), encoding="utf-8")
 
     payload = {
         "generated_by": "scripts/assemble.py",
         "count": len(habits),
+        "active": sum(h["status"] == "active" for h in habits),
         "habits": [
-            {k: h[k] for k in ("id", "title", "stance", "order", "snippet") if k in h}
-            | {k: h[k] for k in ("added", "status", "source", "related") if k in h}
-            | {k: h[k] for k in ("variables", "template") if k in h}
+            {k: h[k] for k in ("id", "title", "summary", "stance", "order", "snippet") if k in h}
+            | {k: h[k] for k in ("added", "revised", "status", "source", "related") if k in h}
+            | {k: h[k] for k in ("variables", "template", "summary_template") if k in h}
             for h in habits
         ],
     }
@@ -136,7 +151,8 @@ def main():
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
 
-    print(f"{len(habits)} habits -> assembled/habits.md, assembled/habits.json")
+    active = sum(h["status"] == "active" for h in habits)
+    print(f"{active} active of {len(habits)} habits -> assembled/habits.md, assembled/habits.json")
 
 
 if __name__ == "__main__":

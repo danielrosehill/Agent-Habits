@@ -1,9 +1,13 @@
 ---
 name: install-habits
-description: Install or update the Habits-Of-Claude block in a system prompt file — all habits or a named subset — into ~/CLAUDE.md, a project CLAUDE.md, or AGENTS.md. Writes a marker-delimited managed region so re-running is idempotent and hand-written prose is left untouched. Use when asked to install the habits, add a specific habit snippet somewhere, push habit edits out to a system prompt, or apply the habits to another project.
+description: Install or update the Habits-Of-Claude block in a system prompt file — all habits or a named subset — into ~/CLAUDE.md, a project CLAUDE.md, or AGENTS.md. User level uses index mode (one summary line per habit in the prompt, full texts in ~/.config/agent-habits/); shared project files use inline mode. Writes a marker-delimited managed region so re-running is idempotent and hand-written prose is left untouched. Use when asked to install the habits, add a specific habit snippet somewhere, push habit edits out to a system prompt, or apply the habits to another project.
 ---
 
 # Install habits into a system prompt
+
+Work in the Habits-Of-Claude clone. With `${CLAUDE_PLUGIN_ROOT}` unset, its path is
+`source_repo` in `~/.config/agent-habits/index.json`; failing that, clone
+`danielrosehill/Habits-Of-Claude`.
 
 The habits are the source; a system prompt is a build target. Never hand-edit the
 installed block — edit `habits/*.md`, regenerate, reinstall.
@@ -14,7 +18,18 @@ installed block — edit `habits/*.md`, regenerate, reinstall.
 python3 scripts/assemble.py                    # habits/*.md -> assembled/
 python3 scripts/install.py                     # dry run against ~/CLAUDE.md
 python3 scripts/install.py --write             # apply, backing the target up first
+python3 scripts/check.py context               # verify
 ```
+
+## Modes
+
+- **index** (default): the block holds one line per habit, `**Title** (`id`): summary`,
+  and points at the habits folder. The full snippets are written to
+  `~/.config/agent-habits/<id>.md` with an `index.json`. This keeps the always-loaded
+  prompt around 1,000 tokens. `--habits-dir` picks another folder, and the choice
+  is recorded in the block so later reinstalls reuse it.
+- **inline** (`--mode inline`): full snippets in the block. Use it for a project
+  file other people read, where a path into one user's home means nothing.
 
 `assemble.py` first, always — `install.py` reads `assembled/habits.json`, so skipping
 it silently installs the previous generation.
@@ -28,10 +43,11 @@ For a project CLAUDE.md, or when the user wants one specific snippet rather than
 whole set:
 
 ```bash
-python3 scripts/install.py --only agent-first,verify-dont-infer --target ./CLAUDE.md --write
+python3 scripts/install.py --mode inline --only agent-first,verify-dont-infer --target ./CLAUDE.md --write
 ```
 
-Unknown ids are rejected rather than silently skipped. Habit ids are the filenames in
+Unknown or retired ids are rejected rather than silently skipped. With `--only`, the
+folder is not pruned, so a subset install never deletes the user-level files. Habit ids are the filenames in
 `habits/`; `assembled/habits.json` has them with titles and stances if you need to
 pick.
 
