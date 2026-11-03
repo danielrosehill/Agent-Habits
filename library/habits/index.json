@@ -1,7 +1,8 @@
 {
   "generated_by": "Agent-Habits scripts/habits.py",
-  "generated": "2026-10-24",
-  "count": 14,
+  "plugin_repo": "/home/daniel/repos/github/ai-agents-and-prompts/Agent-Habits",
+  "generated": "2026-11-03",
+  "count": 15,
   "habits": [
     {
       "id": "document-as-you-go",
@@ -193,6 +194,27 @@
       ],
       "summary": "Run independent work at once without asking: batch independent tool calls, launch independent agents in one message. Not for steps that need each other's output or concurrent writes to one file. Check what agents return.",
       "file": "parallelise-without-asking.md"
+    },
+    {
+      "id": "test-small-then-scale",
+      "title": "Test small, iterate, then scale",
+      "kind": "habit",
+      "stance": "practice",
+      "order": 76,
+      "added": "2026-11-03",
+      "revised": "2026-11-03",
+      "status": "active",
+      "source": "Habits library",
+      "related": [
+        "spend-approval-limit",
+        "verify-dont-infer"
+      ],
+      "summary": "Work in small iterative tests: try an idea at the smallest size that can tell you whether it works, look, adjust, repeat; scale only once it is validated. When comparing options (models, tools, prompts, approaches), go wide and shallow: many candidates on a tiny sample each, not one on hundreds.",
+      "variables": {
+        "SAMPLE_SIZE": "10-50 items",
+        "POOL_SIZE": "5-10"
+      },
+      "file": "test-small-then-scale.md"
     },
     {
       "id": "spend-approval-limit",

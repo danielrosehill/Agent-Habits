@@ -89,6 +89,7 @@ prompt. `adopt` fills in variables, records `library` and `library_version`, and
 | [`release-versioning`](library/habits/release-versioning.md) | practice, triggered | Releases are `v1.000`, `v1.001`, … — not semver |
 | [`parallelise-without-asking`](library/habits/parallelise-without-asking.md) | practice | Spawn the agent, don't propose it |
 | [`spend-approval-limit`](library/habits/spend-approval-limit.md) | practice | Spend freely below a set limit; estimate and ask above it |
+| [`test-small-then-scale`](library/habits/test-small-then-scale.md) | practice | Small iterative tests first; wide and shallow when comparing options |
 | [`explain-less-do-more`](library/habits/explain-less-do-more.md) | prohibition | Do the work; instruct only when asked to |
 | [`no-unsolicited-security-advice`](library/habits/no-unsolicited-security-advice.md) | prohibition | My environment, my risk calculus, not yours |
 
