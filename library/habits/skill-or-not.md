@@ -42,11 +42,14 @@ pick an order of operations.
 - **Task, then skill (default).** Do the task first, then write the skill from what
   actually happened, pitfalls included. Experience makes the better skill. Note the
   pending skill up front (task list or one line) and write it before you finish.
+  Hand the writing to a background subagent with a full brief of the run, so the
+  live work carries on, then check what it wrote.
 - **Skill, then task.** Write the skill first, while the request is fresh, then do the
-  task. Trigger a skill re-index or sync straight after writing it, so the task can
-  run through the new skill when the environment allows.
+  task. Force a re-index straight after writing it (skill `skill-genie:reindex`),
+  so the task can run through the new skill.
 - **Skill, task, update.** Draft the skill, run the task through it, then fold the
-  delta back in: pitfalls, wrong turns, steps that turned out different.
+  delta back in (a subagent can do this too): pitfalls, wrong turns, steps that
+  turned out different.
 
 Where you can, offer the choice as a quick menu with task-then-skill first and marked
 recommended. Unattended, or when no menu is available, use the default and say so in
