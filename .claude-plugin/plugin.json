@@ -1,6 +1,6 @@
 {
   "name": "habits",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Standing instructions for an AI agent as one markdown file each: habits (rules, always on or triggered) and SOPs (procedures). Installs one small generated block in CLAUDE.md/AGENTS.md pointing at a private ~/.claude-user-data folder. Ships a library of example habits to adopt, and skills to add, adopt, update, remove, list, check and share habits, write and run SOPs, sync, and verify the prompt wiring.",
   "author": {
     "name": "Daniel Rosehill",

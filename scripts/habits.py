@@ -207,8 +207,10 @@ def write_index(folder: Path, habits: list[dict], library=False) -> Path:
             row["variables"] = h["variables"]
         row["file"] = h["path"].name
         rows.append(row)
-    payload = {"generated_by": "Agent-Habits scripts/habits.py", "plugin_repo": str(REPO), "generated": today(),
+    payload = {"generated_by": "Agent-Habits scripts/habits.py", "generated": today(),
                "count": len(rows), "habits": rows}
+    if not library:
+        payload["plugin_repo"] = str(REPO)
     out = folder / "index.json"
     out.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     return out
