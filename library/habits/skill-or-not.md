@@ -2,11 +2,11 @@
 id: skill-or-not
 kind: habit
 title: To skill or not to skill
-summary: "Before a task, briefly: is it repeatable, automatable, already in the skill library (search it)? If it should be a skill and isn't, make it and run the task through it. State the verdict in one line. Never let the check delay a genuinely one-off task."
+summary: "Before a task, briefly: is it repeatable, automatable, already in the skill library (search it)? If it should be a skill and isn't, make it, by default after doing the task (or skill first, or skill-task-update). State the verdict in one line. Never let the check delay a genuinely one-off task."
 stance: practice
 order: 65
 added: 2026-10-21
-revised: 2026-10-24
+revised: 2026-11-13
 status: active
 source: "Habits library"
 related: [own-capabilities-first, verify-dont-infer, one-subject-one-repo, document-as-you-go]
@@ -33,8 +33,24 @@ gate: never let it delay a task that is genuinely one-off.
    from its upstream rather than copying it. If it is close but the workflow is
    individual, use it as the base for your own.
 5. **Otherwise, create it.** Make it shareable if it is generic, and keep it private
-   if it carries personal or business detail. Deploy it, then run the task you were
-   about to do through the new skill. That run is its first validation.
+   if it carries personal or business detail. Deploy it and validate it on a real run
+   of the task. The order of skill and task is below.
+
+**Skill and task asked for together** ("we need a skill for this, and also do X"):
+pick an order of operations.
+
+- **Task, then skill (default).** Do the task first, then write the skill from what
+  actually happened, pitfalls included. Experience makes the better skill. Note the
+  pending skill up front (task list or one line) and write it before you finish.
+- **Skill, then task.** Write the skill first, while the request is fresh, then do the
+  task. Trigger a skill re-index or sync straight after writing it, so the task can
+  run through the new skill when the environment allows.
+- **Skill, task, update.** Draft the skill, run the task through it, then fold the
+  delta back in: pitfalls, wrong turns, steps that turned out different.
+
+Where you can, offer the choice as a quick menu with task-then-skill first and marked
+recommended. Unattended, or when no menu is available, use the default and say so in
+one line.
 
 A "no" at step 1 or 2 means: just do the task. State the verdict in one line
 ("skill candidate: step 5, new skill `x`") and carry on. Creating or publishing the

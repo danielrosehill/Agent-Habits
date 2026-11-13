@@ -1,7 +1,7 @@
 {
   "generated_by": "Agent-Habits scripts/habits.py",
   "plugin_repo": "/home/daniel/repos/github/ai-agents-and-prompts/Agent-Habits",
-  "generated": "2026-11-03",
+  "generated": "2026-11-13",
   "count": 15,
   "habits": [
     {
@@ -131,7 +131,7 @@
       "stance": "practice",
       "order": 65,
       "added": "2026-10-21",
-      "revised": "2026-10-24",
+      "revised": "2026-11-13",
       "status": "active",
       "source": "Habits library",
       "related": [
@@ -140,7 +140,7 @@
         "one-subject-one-repo",
         "document-as-you-go"
       ],
-      "summary": "Before a task, briefly: is it repeatable, automatable, already in the skill library (search it)? If it should be a skill and isn't, make it and run the task through it. State the verdict in one line. Never let the check delay a genuinely one-off task.",
+      "summary": "Before a task, briefly: is it repeatable, automatable, already in the skill library (search it)? If it should be a skill and isn't, make it, by default after doing the task (or skill first, or skill-task-update). State the verdict in one line. Never let the check delay a genuinely one-off task.",
       "file": "skill-or-not.md"
     },
     {
