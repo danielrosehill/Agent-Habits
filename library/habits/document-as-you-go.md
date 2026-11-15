@@ -43,9 +43,6 @@ session artifacts: no `SUMMARY.md`, no `IMPLEMENTATION_NOTES.md`, no dated work
 logs. Update the existing document rather than starting a parallel one. Writing
 nothing is the right outcome more often than not.
 
-Long-form treatment, with a slash command for sweeping a session that got away:
-<https://github.com/danielrosehill/Document-As-You-Go>
-
 ## Why
 
 The expensive part of most work is not the change, it is establishing the facts that

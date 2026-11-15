@@ -1,79 +1,31 @@
-[![Claude Code Repos Index](https://img.shields.io/badge/Claude%20Code%20Repos-Index-blue?style=flat-square&logo=github)](https://github.com/danielrosehill/Claude-Code-Repos-Index)
-
 # Agent-Habits
 
-Your standing instructions for an AI agent, kept as one markdown file each, with a
-small generated block in your system prompt (`CLAUDE.md`, `AGENTS.md`) that points
-at them. There are two kinds:
+A library of standing habits for AI coding agents: the working rules I give my own
+agents, depersonalised with `{{VARIABLES}}` and free for anyone to import. This repo
+is library-only: files and an index, no tooling.
 
-- **Habits:** rules for how the agent behaves, in force before the task is known.
-  "Check the thing itself, not a status code that stands in for it." "Release tags
-  are `v1.000`, `v1.001`, …"
-- **SOPs:** procedures for one recurring job, followed when their trigger matches.
-  "To publish a package: …"
+A habit is a rule for how the agent behaves, in force before the task is known.
+"Check the thing itself, not a status code that stands in for it." "Release tags are
+`v1.000`, `v1.001`, ..." Each is one markdown file, written in the first person
+("when I ask...") so that after import it reads as your own prompt.
 
-The plugin (name `habits`) is the machinery plus a **library of example habits**
-you can adopt. Your own habits and SOPs live in a private folder you own and never
-enter this repo.
+## Using it
 
-This repo was previously `Habits-Of-Claude`. The SOP half was previously the
-separate `Claude-SOPs` plugin (`sop-library`), merged in on 2026-10-24.
+**With Canopy:** the `canopy-habits` plugin in the Canopy repo reads this library by
+default (`library/habits/*.md` plus `library/habits/index.json`).
 
-## Habit or SOP?
+- `list-library`: browse the habits here and see which you already have.
+- `adopt-habit`: import one habit, filling in its variables, or import all of them at
+  once ("adopt everything"; skip any by id). Adopting records `library` and
+  `library_version`, so a later revision here can be detected.
 
-Ask whether it is a rule or a sequence of steps, not whether it applies always or
-sometimes. A rule that only matters for one kind of task is a habit with a
-`trigger`. Anything with numbered steps is an SOP. Full test, edge cases and what is
-neither: [`references/habit-or-sop.md`](references/habit-or-sop.md).
-
-## Why it costs so little context
-
-```
-~/CLAUDE.md                          one generated block:
-  ## Habits                            one summary line per habit (triggered ones grouped)
-  ## Procedures                        one trigger line per SOP
-        │
-        ▼  read only when relevant
-~/.claude-user-data/habits/<id>.md   full rule, exceptions, rationale
-~/.claude-user-data/sops/<id>.md     full procedure
-```
-
-Inlining the full texts of 14 habits cost ~18,500 characters (~4,600 tokens) in
-every session. The index block for the same 14 is ~4,500 characters. Each SOP adds
-one line. `check context` enforces a 7,000-character budget.
-
-## Three places, three lifecycles
-
-| What | Where | Visibility |
-|---|---|---|
-| Machinery: `scripts/`, `skills/`, `schema/`, `references/`, `templates/` | this repo | public |
-| Example library: `library/habits/` (with `{{VARIABLES}}`), `library/sops/` | this repo | public |
-| Your habits and SOPs | `~/.claude-user-data/habits/`, `~/.claude-user-data/sops/` | one private git repo at `~/.claude-user-data` |
-| Local config | `~/.claude-plugins/habits/config.json` | never committed |
-
-`$CLAUDE_USER_DATA` overrides `~/.claude-user-data`. Never put user content under
-`~/.claude`. See [`references/user-data-convention.md`](references/user-data-convention.md).
-
-## Quick start
-
-```bash
-python3 scripts/habits.py list --library                         # browse the examples
-python3 scripts/habits.py adopt verify-dont-infer
-python3 scripts/habits.py adopt spend-approval-limit --set APPROVAL_LIMIT='$20'
-python3 scripts/sop.py init                                      # ~/.claude-user-data/sops
-python3 scripts/habits.py install                                # dry run against ~/CLAUDE.md
-python3 scripts/habits.py install --write
-python3 scripts/habits.py check                                  # library + source + context
-```
-
-Or just say what you want. The `setup` skill walks through all of this, including the
-private remote.
+**Without Canopy:** copy a file from `library/habits/` into wherever you keep agent
+instructions. Replace each `{{NAME}}` by hand with your own value (the defaults are
+declared under `variables:` in the front matter), delete the `variables:` block, and
+paste the `## Snippet` section into your `CLAUDE.md`, `AGENTS.md` or equivalent. Use
+the `summary` line if you only want a one-line pointer in your always-loaded prompt.
 
 ## The library
-
-Each is first person ("when I ask…"), so after adoption it reads as your own
-prompt. `adopt` fills in variables, records `library` and `library_version`, and
-`outdated` reports when the library has since revised one.
 
 | Habit | Stance | In one line |
 |---|---|---|
@@ -84,113 +36,78 @@ prompt. `adopt` fills in variables, records `library` and `library_version`, and
 | [`escalate-before-declaring-failure`](library/habits/escalate-before-declaring-failure.md) | practice | One blocked route is not a dead end |
 | [`own-capabilities-first`](library/habits/own-capabilities-first.md) | practice | Built-in beats external unless told or known otherwise |
 | [`one-subject-one-repo`](library/habits/one-subject-one-repo.md) | practice | Knowledge gets its own home, at maximum specificity |
+| [`bring-out-then-in`](library/habits/bring-out-then-in.md) | practice, triggered | Build it public first, then bring it in for your own use |
 | [`skill-or-not`](library/habits/skill-or-not.md) | practice | Before a task, ask whether it should become a skill |
 | [`ship-without-asking`](library/habits/ship-without-asking.md) | practice | Finished means deployed, not committed |
-| [`release-versioning`](library/habits/release-versioning.md) | practice, triggered | Releases are `v1.000`, `v1.001`, … — not semver |
+| [`release-versioning`](library/habits/release-versioning.md) | practice, triggered | Releases are `v1.000`, `v1.001`, ..., not semver |
 | [`parallelise-without-asking`](library/habits/parallelise-without-asking.md) | practice | Spawn the agent, don't propose it |
-| [`spend-approval-limit`](library/habits/spend-approval-limit.md) | practice | Spend freely below a set limit; estimate and ask above it |
 | [`test-small-then-scale`](library/habits/test-small-then-scale.md) | practice | Small iterative tests first; wide and shallow when comparing options |
+| [`spend-approval-limit`](library/habits/spend-approval-limit.md) | practice | Spend freely below a set limit; estimate and ask above it |
+| [`context-lean`](library/habits/context-lean.md) | practice | Tool results are re-sent every call: read by range, cap output, delegate sweeps |
 | [`explain-less-do-more`](library/habits/explain-less-do-more.md) | prohibition | Do the work; instruct only when asked to |
-| [`no-unsolicited-security-advice`](library/habits/no-unsolicited-security-advice.md) | prohibition | My environment, my risk calculus, not yours |
+| [`stay-in-scope`](library/habits/stay-in-scope.md) | prohibition | Do the task asked, not adjacent work |
+| [`no-unsolicited-security-advice`](library/habits/no-unsolicited-security-advice.md) | prohibition | Your environment, your risk calculus, not the agent's |
 
-Example SOPs: [`publish-a-package`](library/sops/publish-a-package.md),
-[`set-up-a-new-machine`](library/sops/set-up-a-new-machine.md). These are invented
-examples of the format. Real SOPs name real hosts and accounts and stay private.
+`library/habits/index.json` is the same list for an agent, generated by the
+`index-library` subcommand of Canopy's `canopy-habits` script.
 
-`library/habits/index.json` is the same list for an agent, generated by
-`habits.py index --library`.
+Example SOPs (procedures for one recurring job, a different thing from a habit):
+[`publish-a-package`](library/sops/publish-a-package.md),
+[`set-up-a-new-machine`](library/sops/set-up-a-new-machine.md). They are invented
+examples of the format; real SOPs name real hosts and accounts and stay private.
 
-## Skills
+## File format
 
-The plugin is reached through a skill catalogue rather than installed, so
-`${CLAUDE_PLUGIN_ROOT}` may be unset. Every skill resolves `$PLUGIN` to that, else
-to `plugin_repo` recorded in `~/.claude-user-data/habits/index.json`, else a fresh
-clone.
-
-| Skill | For |
-|---|---|
-| `setup` | First run, second machine, moving the folder |
-| `sync` | Commit and push or pull `~/.claude-user-data`, then reinstall |
-| `adopt-habit` | Take a habit from the library, filling in its values |
-| `add-habit` | Write a new habit of your own |
-| `update-habit` | Revise a habit, or merge a newer library version |
-| `remove-habit` | Retire (default) or delete a habit |
-| `list-habits` | Your habits, the library, or "which habit covers X" |
-| `share-habit` | Depersonalise one of yours into the public library (maintainer) |
-| `sop-write`, `sop-edit`, `sop-remove`, `sop-list`, `sop-run` | Write, change, retire, review and follow SOPs |
-| `check-habits` | Validate habits and SOPs: parse, summary fidelity, overlap, wrong kind |
-| `context-check` | Verify the CLAUDE.md block is single, current and in budget; repair |
-| `install-habits` | Install the block; inline mode for shared project files |
-| `reconcile-habits` | Hand-written prompt prose versus the files |
-
-`/sop` (in `commands/`) dispatches to the SOP skills.
-
-## File formats
-
-**Habit**, `<id>.md`:
+`library/habits/<id>.md`:
 
 ```markdown
 ---
 id: release-versioning            # equals the filename
-title: Number releases vMAJOR.NNN
-summary: "<the rule plus its main exception; ≤320 chars; this line is always in context>"
 kind: habit
+title: Number releases vMAJOR.NNN
+summary: "<the rule plus its main exception; max 320 chars; the always-in-context line>"
 trigger: "cutting a release, creating a tag, or bumping a version"   # optional
-stance: practice | prohibition
-order: 72                         # multiples of 10; practices before prohibitions
+stance: practice                  # or: prohibition
+order: 72                         # sort key; practices before prohibitions
 added: 2026-10-24
-revised: 2026-10-24               # once edited; the library's version marker
-status: active | retired
-source: "conversation, 2026-10-24"
+revised: 2026-10-24               # the version marker adopt records
+status: active                    # or: retired
+source: "Habits library"
+library: release-versioning       # optional
+library_version: 2026-10-24       # optional
 related: [ship-without-asking]
-library: release-versioning       # set by adopt
-library_version: 2026-10-24       # set by adopt
-variables:                        # library only; adopt renders them
-  NAME: "default"   # meaning
+variables:                        # optional; adopt substitutes {{NAME}}
+  NAME: "default"   # what it means
 ---
 
 ## Snippet
-<the full rule, addressed to the agent, standalone>
+<the full rule, addressed to the agent, standalone; may use {{NAME}}>
 
 ## Why
 <the rationale: what it prevents, what changed>
 ```
 
-**SOP**: [`references/sop-format.md`](references/sop-format.md), with schema
-[`schema/sop.schema.json`](schema/sop.schema.json).
-
-## Scripts
-
-- **`scripts/habits.py`**: `path`, `list`, `adopt`, `outdated`, `validate`, `index`,
-  `install`, `check`. `--root` goes before the subcommand.
-- **`scripts/sop.py`**: `init`, `new`, `list`, `show`, `index`, `validate`, `retire`.
-  It resolves its folder from `$CLAUDE_SOPS_DIR`, then
-  `~/.claude-plugins/habits/config.json`, then `$CLAUDE_USER_DATA/sops`.
-
-Both use the standard library only, so no venv is needed.
-
-`install` is dry-run by default and backs the target up on `--write`. It converts
-legacy `habits-of-claude` and `claude-sops` blocks into the single
-`<!-- agent-habits:begin/end -->` block. `--mode inline --only a,b` writes full
-snippets instead, for a project file other people read.
-
-Design notes from the SOP side: [`docs/sop-design-notes.md`](docs/sop-design-notes.md).
+Variables appear as `{{NAME}}` in the summary and snippet, each with a default and a
+comment declared under `variables:`.
 
 ## What does not belong here
 
-Facts about a particular machine or account, such as which server fronts which
-tool, what a hostname means, or that Python uses `uv`. Those are environment
-configuration, not habits, and they stay in `CLAUDE.md` and its reference files.
-The test: would it still be true on someone else's machine, in an unfamiliar
-codebase?
+Facts about a particular machine or account: which server fronts which tool, what a
+hostname means, which language runtime to use. Those are environment configuration,
+not habits. The test: would it still be true on someone else's machine, in an
+unfamiliar codebase?
 
-## Relation to Document-As-You-Go
+## History
 
-[`Document-As-You-Go`](https://github.com/danielrosehill/Document-As-You-Go) was the
-first pass at this idea: one habit developed on its own, with a slash command for
-retroactive sweeps. The insight that came out of it was never one instruction.
-Standing dispositions are the useful unit.
+1. **Habits-Of-Claude:** the first form, a plugin for keeping habits as files, with a
+   small example library. The SOP half was a separate plugin, `Claude-SOPs`.
+2. **Agent-Habits plugin (v1.1.1):** the repo was renamed, the SOP plugin merged in on
+   2026-10-24, and the plugin shipped its own scripts, skills and templates alongside
+   the library.
+3. **Library only (2026-11-15):** the tooling moved into the Canopy repo as the plugin
+   `canopy-habits`, which reads this repo as its default library. This repo now holds
+   only the library.
 
----
+## License
 
-For more Claude Code projects, visit my [Claude Code Repos Index](https://github.com/danielrosehill/Claude-Code-Repos-Index).
+See [LICENSE](LICENSE).

@@ -1,7 +1,7 @@
 {
-  "generated_by": "Agent-Habits scripts/habits.py",
-  "generated": "2026-11-13",
-  "count": 15,
+  "generated_by": "canopy-habits scripts/habits.py",
+  "generated": "2026-11-15",
+  "count": 18,
   "habits": [
     {
       "id": "document-as-you-go",
@@ -124,6 +124,24 @@
       "file": "one-subject-one-repo.md"
     },
     {
+      "id": "bring-out-then-in",
+      "title": "Bring out, then in",
+      "kind": "habit",
+      "stance": "practice",
+      "order": 62,
+      "trigger": "building a utility, integration, plugin or other software",
+      "added": "2026-11-15",
+      "revised": "2026-11-15",
+      "status": "active",
+      "source": "Habits library",
+      "related": [
+        "one-subject-one-repo",
+        "agent-first"
+      ],
+      "summary": "Build it public first, then bring it in: a utility, integration or plugin ships as a generic open-source release my own install uses like any user's, with my private details in a user-data area, never in the code. Exceptions: inherently private, or already well covered (use or contribute to that).",
+      "file": "bring-out-then-in.md"
+    },
+    {
       "id": "skill-or-not",
       "title": "To skill or not to skill",
       "kind": "habit",
@@ -237,6 +255,29 @@
       "file": "spend-approval-limit.md"
     },
     {
+      "id": "context-lean",
+      "title": "Keep session context lean",
+      "kind": "habit",
+      "stance": "practice",
+      "order": 79,
+      "added": "2026-11-15",
+      "revised": "2026-11-15",
+      "status": "active",
+      "source": "Habits library",
+      "related": [
+        "parallelise-without-asking",
+        "own-capabilities-first",
+        "verify-dont-infer"
+      ],
+      "summary": "Tool results are re-sent on every later call: read big files by range, cap command output, send sweeps to subagents; search/fetch subagents get model {{SEARCH_SUBAGENT_MODEL}} or {{LOOKUP_SUBAGENT_MODEL}}.",
+      "variables": {
+        "SEARCH_SUBAGENT_MODEL": "sonnet",
+        "LOOKUP_SUBAGENT_MODEL": "haiku",
+        "LARGE_FILE_LINES": "a few hundred"
+      },
+      "file": "context-lean.md"
+    },
+    {
       "id": "explain-less-do-more",
       "title": "Explain less, do more",
       "kind": "habit",
@@ -252,6 +293,24 @@
       ],
       "summary": "Deliver the thing, not a walkthrough, option menu or lesson. No preamble, no diff recap, no closing summary. Make judgement calls and say which way in a sentence, unless a wrong call would be costly or irreversible.",
       "file": "explain-less-do-more.md"
+    },
+    {
+      "id": "stay-in-scope",
+      "title": "Do what was asked, not what else seems useful",
+      "kind": "habit",
+      "stance": "prohibition",
+      "order": 82,
+      "added": "2026-11-15",
+      "revised": "2026-11-15",
+      "status": "active",
+      "source": "Habits library",
+      "related": [
+        "explain-less-do-more",
+        "ship-without-asking",
+        "spend-approval-limit"
+      ],
+      "summary": "Do the task asked, not adjacent work: no unrequested benchmarks, test or eval runs, audits, refactors, migrations or extra deliverables. Name a worthwhile extra in one line and do it only on a yes. Standing habits (document, verify, push) are not extras.",
+      "file": "stay-in-scope.md"
     },
     {
       "id": "no-unsolicited-security-advice",
